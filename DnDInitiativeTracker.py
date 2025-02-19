@@ -5,13 +5,25 @@ import pandas as pd
 import readline
 
 def rlinput(prompt, prefill=''):
-    # This annoyingly only handles strings right now. Not int or bool support
+    def strtobool (val):
+        """Convert a string representation of truth to true (1) or false (0).
+        True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
+        are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
+        'val' is anything else.
+        """
+        val = val.lower()
+        if val in ('y', 'yes', 't', 'true', 'on', '1'):
+            return 1
+        elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+            return 0
+        else:
+            raise ValueError("invalid truth value %r" % (val,))
     readline.set_startup_hook(lambda: readline.insert_text(str(prefill)))
     try:
         if isinstance(prefill, str):
             return input(prompt)
         elif isinstance(prefill, bool):
-            return bool(input(prompt))
+            return bool(strtobool(input(prompt)))
         elif prefill.is_integer():
             return int(input(prompt))
     finally:
@@ -37,7 +49,9 @@ def AddToInit(Data):
 
 def EditInit(Data, CurrTurn):
     CurrPlayer = Data['Name'][CurrTurn]
-    inp = input('Change initiative of which ID: ')
+    inp = input('Change initiative of which ID [Blank for Current]: ')
+    if inp == '':
+        inp = CurrTurn
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
@@ -51,8 +65,10 @@ def EditInit(Data, CurrTurn):
                 print(Data)
     return Data, CurrTurn
 
-def ApplyDamage(Data):
-    inp = input('Who do you wish to apply damage to? (Insert ID from the tracker list, invalid choice will result in return to action selection) ')
+def ApplyDamage(Data, CurrTurn):
+    if inp == '':
+        inp = CurrTurn
+    inp = input('Who do you wish to apply damage to? (Insert ID from the tracker list)  [Blank for Current]')
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
@@ -119,8 +135,10 @@ def SaveToFile(Data):
         input('Characters saved. Hit any key to proceed. ')
     pass
 
-def ConditionMenu(Data):
-    inp = input('Who do you wish to apply a condition to? (Insert ID from the tracker list) \nMultiple comma sparated IDs will have a condition applied to each:')
+def ConditionMenu(Data, CurrTurn):
+    inp = input('Who do you wish to apply a condition to? (Insert ID from the tracker list) \nMultiple comma sparated IDs will have a condition applied to each [Blank for Current]:')
+    if inp == '':
+        inp = CurrTurn
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
@@ -221,9 +239,9 @@ class ConditionManager:
             ind = int(input('Edit which effect, by index: '))
         self.condTable.loc[ind,"Effect"] = rlinput('Alter the Effect Name: ', prefill = self.condTable.loc[ind,"Effect"])
         self.condTable.loc[ind,"Duration"] = rlinput('Alter the Duration to: ', prefill = self.condTable.loc[ind,"Duration"])
-        self.condTable.loc[ind,"Alter on End of Turn"] = bool(input('Alter the End of Turn trigger to [Blank for False]: '))
-        self.condTable.loc[ind,"Alter on Start of Turn"] = bool(input('Alter the Start of Turn trigger to [Blank for False]: '))
-        self.condTable.loc[ind,"Sustain"] = bool(input('Alter the Sustain flag to [Blank for False]: '))
+        self.condTable.loc[ind,"Alter on End of Turn"] = rlinput('Alter the End of Turn trigger to: ', prefill = bool(self.condTable.loc[ind,"Alter on End of Turn"]))
+        self.condTable.loc[ind,"Alter on Start of Turn"] = rlinput('Alter the Start of Turn trigger to: ', prefill = bool(self.condTable.loc[ind,"Alter on Start of Turn"]))
+        self.condTable.loc[ind,"Sustain"] = rlinput('Alter the Sustain flag to: ', prefill = bool(self.condTable.loc[ind,"Sustain"]))
     def removeCondition(self, ind = None):
         if ind == None:
             ind = int(input('Delete which effect, by index: '))
@@ -235,33 +253,39 @@ class ConditionManager:
             self.condTable = self.condTable.reset_index(drop=True)
 
     def turnStart(self):
+        rowsToDelete = []
         for ind in self.condTable.index:
             if self.condTable.loc[ind,'Alter on Start of Turn']:
-                if (self.condTable.loc[ind,'Duration']).is_integer():
-                    self.condTable.loc[ind,'Duration'] -= 1
-                else:
+                try:
+                    self.condTable.loc[ind,'Duration'] = int(self.condTable.loc[ind,'Duration']) - 1
+                except ValueError:
                     # prompt with text input to alter condition
-                    delCon = input(f'{self.condTable.loc[ind,"Duration"]} is due to be modified on turn start, do you simply want to delete it? [y/yes/1/True]: ')
+                    delCon = input(f'{self.condTable.loc[ind,"Effect"]} is due to be modified on turn end, do you simply want to delete it? [y/yes/1/True]: ')
                     if delCon.lower() in ('yes', 'true', 't', 'y', '1'):
-                        self.removeCondition(ind)
+                        rowsToDelete.append(ind)
                     else:
                         self.editCondition(ind)
-        rowsToDelete = self.condTable.index[self.condTable['Duration'] == 0].tolist()
+        rowsToDelete2 = self.condTable.index[self.condTable['Duration'] == 0].tolist()
+        rowsToDelete = rowsToDelete + rowsToDelete2
+        rowsToDelete = list(set(rowsToDelete))
         if len(rowsToDelete) > 0:
             self.removeCondition(rowsToDelete)
     def turnEnd(self):
+        rowsToDelete = []
         for ind in self.condTable.index:
             if self.condTable.loc[ind,'Alter on End of Turn']:
-                if (self.condTable.loc[ind,'Duration']).is_integer():
-                    self.condTable.loc[ind,'Duration'] -= 1
-                else:
+                try:
+                    self.condTable.loc[ind,'Duration'] = int(self.condTable.loc[ind,'Duration']) - 1
+                except ValueError:
                     # prompt with text input to alter condition
-                    delCon = input(f'{self.condTable.loc[ind,"Duration"]} is due to be modified on turn end, do you simply want to delete it? [y/yes/1/True]: ')
+                    delCon = input(f'{self.condTable.loc[ind,"Effect"]} is due to be modified on turn end, do you simply want to delete it? [y/yes/1/True]: ')
                     if delCon.lower() in ('yes', 'true', 't', 'y', '1'):
-                        self.removeCondition(ind)
+                        rowsToDelete.append(ind)
                     else:
                         self.editCondition(ind)
-        rowsToDelete = self.condTable.index[self.condTable['Duration'] == 0].tolist()
+        rowsToDelete2 = self.condTable.index[self.condTable['Duration'] == 0].tolist()
+        rowsToDelete = rowsToDelete + rowsToDelete2
+        rowsToDelete = list(set(rowsToDelete))
         if len(rowsToDelete) > 0:
             self.removeCondition(rowsToDelete)
     def sustainCheck(self, name):
@@ -305,12 +329,13 @@ if __name__ == '__main__':
     elif len(sys.argv) > 1:
         for arg in range(1,len(sys.argv)):
             # Load in each character one by one
-            df1 = pd.read_csv(sys.argv[arg], nrows = 1, sep = ',' keep_default_na=False, dtype=str) #cast to string to make checking if Init is an integer easier
+            df1 = pd.read_csv(sys.argv[arg], nrows = 1, sep = ',', keep_default_na=False, dtype=str) #cast to string to make checking if Init is an integer easier
             df2 = pd.read_csv(sys.argv[arg], skiprows = 2, sep = ',')
             ind = arg - 1
             Data.loc[ind,'Name'] = df1.loc[0,'Name']
             Data.loc[ind,'Mod'] = int(df1.loc[0,'Mod'])
             Data.loc[ind,'HP'] = int(df1.loc[0,'HP'])
+            print(df1.loc[0,'Init'])
             if df1.loc[0,'Init'].isnumeric():
                 Data.loc[ind,'Init'] = int(df1.loc[0,'Init'])
             else:
@@ -355,10 +380,10 @@ Choose an action '          )
                 Data, CurrTurn = EditInit(Data, CurrTurn)
             #Apply damage
             elif Instruction.lower() == 'd':
-                Data = ApplyDamage(Data)
+                Data = ApplyDamage(Data, CurrTurn)
             #Apply Condition
             elif Instruction.lower() == 'c':
-                Data = ConditionMenu(Data)
+                Data = ConditionMenu(Data, CurrTurn)
             #Next turn
             elif Instruction.lower() == 'n':
                 Data, CurrTurn = NextTurn(Data, CurrTurn)
