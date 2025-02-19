@@ -12,7 +12,7 @@ After reading the initiatives and rolling the necessary ones (if Init field is l
 + **Add** - Add another entity to the list. The program will prompt to insert a name, an initiative score or modifier, a dexterity score and an HP score. Before adding the entity, the program will prompt for confirmation.
 + **Damage** - Apply damage to someone. The program will prompt to select an entity via their turn order ID (note that it counts from 0), and then insert an amount of damage. If the user wishes to heal the entity instead, they can insert a negative score. Example: after selecting ID 8, the user types 6, dealing 6 damage to the entity with ID 8. If the user instead types -6, the entity will be healed by 6 HP.
 + **Conditon** - Edit the condtions imposed on character.
-+ **Next** - Go to next turn. This will make the arrow indicating the turn advance by one.
++ **Next** - Go to next turn. This will make the arrow indicating the turn advance by one. This triggers on-turn end condition changes, and the next characters' on-turn start condition changes, as well as prompting whether you sustained any running effects.
 + **Edit** - Change the initiative value for a player; reorder the list.
 + **Quit** - Exit from the tracker. If the user confirms, the program quits. **No data is saved.**
 + **Remove** - Remove someone from the list. The program prompts to select the ID of an entity, and then ask for confirmation. If the user confirms, the entity is removed from the turn order.
