@@ -2,3 +2,4 @@ Name,Init,Mod,HP
 Hero,,9,66
 Effect,Duration,Alter on Start of Turn,Alter on End of Turn,Sustain
 Frightrened,2,False,True,False
+Bless,10 min,False,True,False
