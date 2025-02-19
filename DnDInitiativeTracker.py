@@ -305,7 +305,7 @@ if __name__ == '__main__':
     elif len(sys.argv) > 1:
         for arg in range(1,len(sys.argv)):
             # Load in each character one by one
-            df1 = pd.read_csv(sys.argv[arg], nrows = 1, sep = ',', dtype=str) #cast to string to make checking if Init is an integer easier
+            df1 = pd.read_csv(sys.argv[arg], nrows = 1, sep = ',' keep_default_na=False, dtype=str) #cast to string to make checking if Init is an integer easier
             df2 = pd.read_csv(sys.argv[arg], skiprows = 2, sep = ',')
             ind = arg - 1
             Data.loc[ind,'Name'] = df1.loc[0,'Name']
