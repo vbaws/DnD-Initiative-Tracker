@@ -51,7 +51,7 @@ def EditInit(Data, CurrTurn):
     CurrPlayer = Data['Name'][CurrTurn]
     inp = input('Change initiative of which ID [Blank for Current]: ')
     if inp == '':
-        inp = CurrTurn
+        inp = str(CurrTurn)
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
@@ -68,7 +68,7 @@ def EditInit(Data, CurrTurn):
 def ApplyDamage(Data, CurrTurn):
     inp = input('Who do you wish to apply damage to? (Insert ID from the tracker list)  [Blank for Current]')
     if inp == '':
-        inp = CurrTurn
+        inp = str(CurrTurn)
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
@@ -138,7 +138,7 @@ def SaveToFile(Data):
 def ConditionMenu(Data, CurrTurn):
     inp = input('Who do you wish to apply a condition to? (Insert ID from the tracker list) \nMultiple comma sparated IDs will have a condition applied to each [Blank for Current]:')
     if inp == '':
-        inp = CurrTurn
+        inp = str(CurrTurn)
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
