@@ -1,7 +1,10 @@
 ### English version
 
+I have overhauled the project I forked this from quite a lot now. Most edge cases tested. If you actually try this please post issues if you have them.
+
 # D&D and Pafthfinder Initiative Tracker
 A short python script for console, used to help manage and track initiative and combat in Dungeons&Dragons, Pathfinder and other similar systems. Re-written with Pathfinder 2e in mind.
+Automation for conditions changing at start/end of turn is implemented.
 
 # Usage
 An example of a valid document can be found in the repository under the name `Hero.csv` and `BadGuy.csv`. To start the script with the characters to load as arguements, one such example may be `python DnDInitiativeTracker.py Hero.csv BadGuy.csv`. I don't currently support saving to anywhere except where main script is running, but eventually might. When I update my code for home use I might remember to update this too.
@@ -13,7 +16,7 @@ After reading the initiatives and rolling the necessary ones (if Init field is l
 + **Edit** - Change the initiative value for a player; reorder the list.
 + **Quit** - Exit from the tracker. If the user confirms, the program quits. **No data is saved.**
 + **Remove** - Remove someone from the list. The program prompts to select the ID of an entity, and then ask for confirmation. If the user confirms, the entity is removed from the turn order.
-+ **Save** - Save an initiative file. The program will save a file with the given name in the current directory with the current turn order. The file is formatted such that it can be loaded from the program. If no name is provided, the default name is `Initiatives.txt`.
++ **Save** - Save an initiative file. The program will save a file for each character, named by the character name.
 + **Turn** - Set a specific turn. The Program will prompt to insert the ID of an entity, and the turn tracker will jump to that entity.
 
 # License
