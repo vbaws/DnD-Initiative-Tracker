@@ -1,1 +1,9 @@
-
+Name,Init,Mod,HP
+BadGuy,26,7,60
+Effect,Duration,Alter on Start of Turn,Alter on End of Turn,Sustain
+Burn 3,1,False,True,False
+Acid 3,1,True,False,False
+Cold 3,2,False,True,False
+Raise Dead,6,False,True,True
+Summon Animal,5,False,False,True
+Frightrened,2,False,True,False
