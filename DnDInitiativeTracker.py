@@ -66,9 +66,9 @@ def EditInit(Data, CurrTurn):
     return Data, CurrTurn
 
 def ApplyDamage(Data, CurrTurn):
+    inp = input('Who do you wish to apply damage to? (Insert ID from the tracker list)  [Blank for Current]')
     if inp == '':
         inp = CurrTurn
-    inp = input('Who do you wish to apply damage to? (Insert ID from the tracker list)  [Blank for Current]')
     if inp.isnumeric():
         ID = int(inp)
         if ID < len(Data['Name']):
