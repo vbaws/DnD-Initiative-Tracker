@@ -89,6 +89,7 @@ def NextTurn(Data, CurrTurn):
     return Data, CurrTurn
 
 def SetTurn(Data, CurrTurn):
+    currTrunInitial = CurrTurn.copy()
     inp = input('Insert new turn ID ')
     if inp.isnumeric():
         NewTurn = int(inp)
@@ -99,7 +100,7 @@ def SetTurn(Data, CurrTurn):
             CurrTurn = NewTurn
         else:
             input('Invalid selection, please retry. Hit any key to proceed. ')
-    return Data, CurrTurn
+    return Data, currTrunInitial
 
 def RemoveFromInit(Data, CurrTurn):
     inp = input('Who do you wish to remove? (Insert ID from the tracker list, invalid choice will result in return to action selection) ')
@@ -191,6 +192,8 @@ Choose an action '                  )
                         AoSoT = False
                 else:
                     Duration = str(Duration)
+                    AoEoT = False
+                    AoSoT = False
                 Sustain = bool(input('Does the effect need to be sustained every turn [Blank for False]: '))
                 print('Do you want to add the following entity to the condition list? [yN]\n\tEffect: ', Effect, '\n\tDuration: ', Duration, sep='')
                 YN = input()
@@ -224,6 +227,8 @@ class ConditionManager:
                     AoSoT = False
             else:
                 Duration = str(Duration)
+                AoEoT = False
+                AoSoT = False
             Sustain = bool(input('Does the effect need to be sustained every turn [Blank for False]: '))
             print('Do you want to add the following entity to the condition list? [yN]\n\tEffect: ', Effect, '\n\tDuration: ', Duration, sep='')
             YN = input()
